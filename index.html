@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Les Zammours spécial HUGO & SOPHIE </title>
+  <title>Les Zammours spécial HUGO & SA FUTURE FEMME</title>
   <style>
     body {
       font-family: sans-serif;
@@ -78,10 +78,44 @@
 
   <script>
     const data = {
-      "Vie de couple": [...],
-      "Sous la couette": [...],
-      "Vision d’Hugo": [...],
-      "Moment mignon": [...]
+      "Vie de couple": [
+        "Quel est le plat que Sophie kiffe le plus au monde ?",
+        "Quelle tâche ménagère elle déteste tellement qu’elle te la refile en douce ?",
+        "Quelle est sa série “doudou”, celle qu’elle peut revoir en boucle ?",
+        "Dans la maison, quel objet elle a imposé et toi t’as jamais compris pourquoi ?",
+        "Quelle est la petite habitude que t’as et qu’elle trouve insupportable ?",
+        "Elle a le choix entre un city trip et un week-end nature : elle choisit quoi ?",
+        "Quel est le cadeau que tu lui as offert et qu’elle a trouvé… euh… “surprenant” ?"
+      ],
+      "Sous la couette": [
+        "Quelle est la zone du corps où elle aime que tu l’embrasses ?",
+        "Si elle devait donner un surnom à ta technique au lit, ce serait quoi ?",
+        "Sur 10 à combien elle note tes performances selon toi ?",
+        "Quel vêtement ou accessoire te rend sexy à ses yeux (vraiment) ?",
+        "Elle te surprend un soir avec une idée “originale” : elle propose quoi ?",
+        "Dans un fantasme, elle incarnerait quel rôle ?",
+        "Quelle est la position où elle se sent reine du monde ?",
+        "À quel moment vous avez failli vous faire griller pour de vrai ?"
+      ],
+      "Vision d’Hugo": [
+        "Si elle devait te comparer à un animal, ce serait lequel ?",
+        "À quel personnage de film ou série lui fais tu penser ?",
+        "Elle doit choisir une chanson qui vous représente : laquelle elle sort ?",
+        "C’est quoi le truc chez toi qu’elle trouve ridicule mais qu’elle adore quand même ?",
+        "Elle te tatoue un mot pendant ton sommeil, juste pour se venger : elle écrit quoi ?",
+        "Elle dit souvent une phrase à propos de toi. Laquelle ?",
+        "Selon elle : tu serais quel type de père (dans 10 ans) ?"
+      ],
+      "Moment mignon": [
+        "C’est quand le moment où elle a su que t’étais “le bon” ?",
+        "Quelle est la plus belle chose que tu lui as dite selon elle ?",
+        "Si elle devait choisir un moment que vous avez vécu et le revivre en boucle, ce serait lequel ?",
+        "Elle a le droit de garder un seul souvenir de vous deux : c’est quoi ?",
+        "Un mot pour te décrire, selon elle ?",
+        "Une peur qu’elle a pour votre couple ?",
+        "Un rêve qu’elle a, que tu ignores peut-être encore ?",
+        "Comment aimerait-elle fêter votre première anniversaire de mariage ?"
+      ]
     };
 
     const penalties = [
@@ -176,7 +210,7 @@
       showScreen('home');
     }
 
-    // --- WHEEL FUNCTIONS ---
+    // WHEEL
     const canvas = document.getElementById("penaltyWheel");
     const ctx = canvas.getContext("2d");
     const wheelRadius = canvas.width / 2;
@@ -205,7 +239,7 @@
     function spinWheel() {
       if (spinning) return;
       spinning = true;
-      let duration = 3000; // 3 sec
+      let duration = 3000;
       let start = null;
       let rotateSpeed = Math.random() * 10 + 10;
 
@@ -213,7 +247,7 @@
         if (!start) start = timestamp;
         let progress = timestamp - start;
         angle += rotateSpeed;
-        rotateSpeed *= 0.98; // friction
+        rotateSpeed *= 0.98;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.save();
         ctx.translate(wheelRadius, wheelRadius);
