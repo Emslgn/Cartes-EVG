@@ -5,30 +5,80 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Cartes EVG</title>
   <style>
-    body { font-family: sans-serif; padding: 1em; background: #fff8f0; color: #333; }
-    h1 { text-align: center; }
-    .button { display: block; margin: 1em auto; padding: .8em 1.2em;
-      background: #ff7043; color: #fff; border: none; border-radius: 5px; }
-    .card { border: 1px solid #ddd; padding: 1.5em; margin: 1em 0;
-      background: #fff; border-radius: 8px; min-height: 100px; }
-    .hidden { display: none; }
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 2em;
+      background: #0a0f1c;
+      color: white;
+    }
+    h1 {
+      text-align: center;
+      color: #ffffff;
+    }
+    .button {
+      display: inline-block;
+      margin: .5em .2em;
+      padding: .6em 1.2em;
+      background: #1f2a44;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    .button:hover {
+      background: #2c3e60;
+      cursor: pointer;
+    }
+    .card {
+      border: 2px solid #ffffff33;
+      padding: 1.5em;
+      margin: 1em 0;
+      background: #12182b;
+      border-radius: 8px;
+      min-height: 120px;
+    }
+    .highlight {
+      color: #ffd700;
+      font-weight: bold;
+    }
+    .hidden {
+      display: none;
+    }
+    .category-buttons {
+      text-align: center;
+    }
+    .status {
+      text-align: center;
+      margin-top: 1em;
+      font-size: 0.9em;
+      color: #cccccc;
+    }
   </style>
 </head>
 <body>
 
   <div id="home">
     <h1>Cartes EVG</h1>
-    <button class="button" onclick="selectCat('Vie de couple')">Vie de couple</button>
-    <button class="button" onclick="selectCat('Sous la couette')">Sous la couette</button>
-    <button class="button" onclick="selectCat('Vision d’Hugo')">Vision d’Hugo</button>
-    <button class="button" onclick="selectCat('Moment mignon')">Moment mignon</button>
+    <div class="category-buttons">
+      <button class="button" onclick="selectCat('Vie de couple')">Vie de couple</button>
+      <button class="button" onclick="selectCat('Sous la couette')">Sous la couette</button>
+      <button class="button" onclick="selectCat('Vision d’Hugo')">Vision d’Hugo</button>
+      <button class="button" onclick="selectCat('Moment mignon')">Moment mignon</button>
+    </div>
   </div>
 
   <div id="cards" class="hidden">
-    <button class="button" onclick="backHome()">⬅ Retour</button>
+    <button class="button" onclick="backHome()">⬅ Accueil</button>
+    <div class="status" id="progressStatus"></div>
     <div class="card" id="questionBox"></div>
-    <button class="button" onclick="nextQuestion()">Question suivante</button>
-    <button class="button" onclick="randomQuestion()">Carte aléatoire</button>
+    <div class="category-buttons">
+      <button class="button" onclick="nextQuestion()">Suivante</button>
+      <button class="button" onclick="randomQuestion()">Carte aléatoire</button>
+    </div>
+    <div class="category-buttons">
+      <button class="button" onclick="markDone()">✅ Traitée</button>
+      <button class="button" onclick="markUndone()">🕓 À revoir</button>
+    </div>
   </div>
 
   <script>
@@ -73,29 +123,61 @@
       ]
     };
 
-    let currentCat = null, idx = 0;
+    let currentCat = null;
+    let idx = 0;
+    let treated = {};
 
     function selectCat(cat) {
       currentCat = cat;
       idx = 0;
+      if (!treated[cat]) {
+        treated[cat] = new Set();
+      }
       showScreen('cards');
       showQuestion();
     }
+
     function showScreen(id) {
-      document.getElementById('home').classList.toggle('hidden', id != 'home');
-      document.getElementById('cards').classList.toggle('hidden', id != 'cards');
+      document.getElementById('home').classList.toggle('hidden', id !== 'home');
+      document.getElementById('cards').classList.toggle('hidden', id !== 'cards');
     }
+
     function showQuestion() {
-      document.getElementById('questionBox').innerText = data[currentCat][idx];
+      const question = data[currentCat][idx];
+      const isDone = treated[currentCat].has(idx);
+      document.getElementById('questionBox').innerHTML =
+        isDone ? `<span class="highlight">✅ [Traitée]</span><br>${question}` : question;
+      updateProgress();
     }
+
     function nextQuestion() {
       idx = (idx + 1) % data[currentCat].length;
       showQuestion();
     }
+
     function randomQuestion() {
       idx = Math.floor(Math.random() * data[currentCat].length);
       showQuestion();
     }
+
+    function markDone() {
+      treated[currentCat].add(idx);
+      showQuestion();
+    }
+
+    function markUndone() {
+      treated[currentCat].delete(idx);
+      showQuestion();
+    }
+
+    function updateProgress() {
+      const total = data[currentCat].length;
+      const done = treated[currentCat].size;
+      document.getElementById('progressStatus').innerHTML =
+        `Catégorie : <strong>${currentCat}</strong><br>` +
+        `<span class="highlight">${done}</span> / ${total} questions traitées`;
+    }
+
     function backHome() {
       showScreen('home');
     }
