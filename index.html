@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Cartes EVG</title>
+  <title>Les Zammours spécial HUGO & SA FUTURE FEMME</title>
   <style>
     body {
       font-family: sans-serif;
@@ -11,10 +11,12 @@
       padding: 2em;
       background: #0a0f1c;
       color: white;
+      text-align: center;
     }
     h1 {
-      text-align: center;
       color: #ffffff;
+      font-size: 1.8em;
+      margin-bottom: 1em;
     }
     .button {
       display: inline-block;
@@ -32,10 +34,11 @@
     .card {
       border: 2px solid #ffffff33;
       padding: 1.5em;
-      margin: 1em 0;
+      margin: 1em auto;
       background: #12182b;
       border-radius: 8px;
       min-height: 120px;
+      max-width: 600px;
     }
     .highlight {
       color: #ffd700;
@@ -45,20 +48,25 @@
       display: none;
     }
     .category-buttons {
-      text-align: center;
+      margin-top: 1em;
     }
     .status {
-      text-align: center;
       margin-top: 1em;
       font-size: 0.9em;
       color: #cccccc;
+    }
+    #penaltyBox {
+      margin-top: 1em;
+      font-size: 1em;
+      color: #ff6666;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
   <div id="home">
-    <h1>Cartes EVG</h1>
+    <h1>Les Zammours spécial HUGO & SA FUTURE FEMME</h1>
     <div class="category-buttons">
       <button class="button" onclick="selectCat('Vie de couple')">Vie de couple</button>
       <button class="button" onclick="selectCat('Sous la couette')">Sous la couette</button>
@@ -69,6 +77,7 @@
 
   <div id="cards" class="hidden">
     <button class="button" onclick="backHome()">⬅ Accueil</button>
+    <button class="button" onclick="resetGame()">🔁 Réinitialiser le jeu</button>
     <div class="status" id="progressStatus"></div>
     <div class="card" id="questionBox"></div>
     <div class="category-buttons">
@@ -76,9 +85,10 @@
       <button class="button" onclick="randomQuestion()">Carte aléatoire</button>
     </div>
     <div class="category-buttons">
-      <button class="button" onclick="markDone()">✅ Traitée</button>
-      <button class="button" onclick="markUndone()">🕓 À revoir</button>
+      <button class="button" onclick="markCorrect()">✅ Bonne réponse</button>
+      <button class="button" onclick="markWrong()">❌ Mauvaise réponse</button>
     </div>
+    <div id="penaltyBox"></div>
   </div>
 
   <script>
@@ -123,16 +133,44 @@
       ]
     };
 
+    const penalties = [
+      "Boire un shot préparé par 2 potes (libre à eux de doser… ou pas)",
+      "Chanter le refrain d’une chanson d’amour, version slow langoureux",
+      "Écrire un texto absurde à un pote au hasard du groupe (“Tu penses qu’on devrait se reparler ?”)",
+      "Faire une déclaration d’amour à un objet de la pièce",
+      "Faire 15 pompes en criant “Je suis l’homme de la situation”",
+      "Poster une story Insta avec un filtre gênant + un cœur rouge",
+      "Inventer une pub pour vendre Hugo en 20 secondes chrono",
+      "Aller demander un selfie à un inconnu (si vous êtes dehors)",
+      "Aller commander un verre en imitant un accent (au choix du groupe)",
+      "Danser seul pendant 1 minute sur une chanson imposée",
+      "Demander un autographe à quelqu’un dans la rue, comme si c’était une star",
+      "Se faire passer pour un guide touristique et commenter un lieu pendant 30 secondes",
+      "Décrire le physique de ton crush masculin idéal (avec détails)",
+      "Lire à voix haute une lettre d’amour imaginaire à Sophie… en mode tragédie",
+      "Répéter 3 fois une phrase absurde imposée par le groupe avec le plus de conviction possible",
+      "Mimer une scène de film romantique comme si ta vie en dépendait",
+      "Tu dois raconter ton plus grand moment de solitude (niveau collège)",
+      "Imitation de toi en mode dragueur en soirée (soft)",
+      "Tu changes de prénom pendant 30 minutes (tout le monde doit t’appeler ainsi)",
+      "Dis ce que tu penses que chacun ferait s’il gagnait 1 million d’euros demain",
+      "Tu parles comme un robot pendant 5 minutes",
+      "Tu dois appeler tout le monde “Mon trésor” jusqu’à nouvel ordre",
+      "Tu portes un accessoire débile jusqu’au prochain tour",
+      "Tu fais un tour de la pièce en rampant façon commando",
+      "Tu dois tenir la main d’un pote pendant 10 minutes"
+    ];
+
     let currentCat = null;
     let idx = 0;
-    let treated = {};
+    let correctCount = 0;
+    let wrongCount = 0;
 
     function selectCat(cat) {
       currentCat = cat;
       idx = 0;
-      if (!treated[cat]) {
-        treated[cat] = new Set();
-      }
+      correctCount = 0;
+      wrongCount = 0;
       showScreen('cards');
       showQuestion();
     }
@@ -144,9 +182,8 @@
 
     function showQuestion() {
       const question = data[currentCat][idx];
-      const isDone = treated[currentCat].has(idx);
-      document.getElementById('questionBox').innerHTML =
-        isDone ? `<span class="highlight">✅ [Traitée]</span><br>${question}` : question;
+      document.getElementById('questionBox').innerHTML = question;
+      document.getElementById('penaltyBox').innerHTML = "";
       updateProgress();
     }
 
@@ -160,26 +197,36 @@
       showQuestion();
     }
 
-    function markDone() {
-      treated[currentCat].add(idx);
+    function markCorrect() {
+      correctCount++;
       showQuestion();
     }
 
-    function markUndone() {
-      treated[currentCat].delete(idx);
+    function markWrong() {
+      wrongCount++;
+      const gage = penalties[Math.floor(Math.random() * penalties.length)];
+      document.getElementById('penaltyBox').innerHTML = `🎯 GAGE : ${gage}`;
       showQuestion();
     }
 
     function updateProgress() {
       const total = data[currentCat].length;
-      const done = treated[currentCat].size;
       document.getElementById('progressStatus').innerHTML =
         `Catégorie : <strong>${currentCat}</strong><br>` +
-        `<span class="highlight">${done}</span> / ${total} questions traitées`;
+        `<span class="highlight">${correctCount}</span> bonnes réponses | ` +
+        `<span class="highlight">${wrongCount}</span> mauvaises réponses`;
     }
 
     function backHome() {
       showScreen('home');
+    }
+
+    function resetGame() {
+      correctCount = 0;
+      wrongCount = 0;
+      idx = 0;
+      document.getElementById('penaltyBox').innerHTML = "";
+      showQuestion();
     }
   </script>
 
