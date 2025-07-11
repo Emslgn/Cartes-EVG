@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Les Zammours spécial HUGO & SA FUTURE FEMME</title>
+  <title>Les Zammours Spécial HUGO & SOPHIE</title>
   <style>
     body {
       font-family: sans-serif;
@@ -13,7 +13,9 @@
       padding: 2em;
     }
     h1 {
-      color: #fff;
+      color: #ffd700;
+      font-size: 2.5em;
+      margin-bottom: 1em;
     }
     .button {
       margin: 0.5em;
@@ -22,6 +24,10 @@
       color: white;
       border: none;
       border-radius: 5px;
+      font-size: 1em;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
     .button:hover {
       background: #2c3e60;
@@ -41,25 +47,39 @@
     .hidden {
       display: none;
     }
-    #penaltyWheel {
-      margin-top: 2em;
-    }
     #penaltyBox {
       margin-top: 2em;
       font-size: 1.2em;
       font-weight: bold;
       color: #ff6666;
     }
+    #scrollWheel {
+      margin-top: 2em;
+      overflow: hidden;
+      height: 60px;
+      background: #1f2a44;
+      border-radius: 8px;
+      line-height: 60px;
+      font-size: 1.2em;
+    }
+    #scrollWheel span {
+      display: inline-block;
+      padding: 0 2em;
+      animation: scrollText 5s ease-in-out forwards;
+    }
+    @keyframes scrollText {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
   </style>
 </head>
 <body>
-
   <div id="home">
-    <h1>Les Zammours spécial HUGO & SA FUTURE FEMME</h1>
-    <button class="button" onclick="selectCat('Vie de couple')">Vie de couple</button>
-    <button class="button" onclick="selectCat('Sous la couette')">Sous la couette</button>
-    <button class="button" onclick="selectCat('Vision d’Hugo')">Vision d’Hugo</button>
-    <button class="button" onclick="selectCat('Moment mignon')">Moment mignon</button>
+    <h1>Les Zammours Spécial HUGO & SA FUTURE FEMME</h1>
+    <button class="button" onclick="selectCat('Vie de couple')">🍝 Vie de couple</button>
+    <button class="button" onclick="selectCat('Sous la couette')">🔥 Sous la couette</button>
+    <button class="button" onclick="selectCat('Vision d’Hugo')">🤯 Vision d’Hugo</button>
+    <button class="button" onclick="selectCat('Moment mignon')">🥲 Moment mignon</button>
   </div>
 
   <div id="cards" class="hidden">
@@ -67,12 +87,12 @@
     <button class="button" onclick="resetGame()">🔁 Réinitialiser le jeu</button>
     <div class="status" id="progressStatus"></div>
     <div class="card" id="questionBox"></div>
-    <button class="button" onclick="nextQuestion()">Suivante</button>
-    <button class="button" onclick="randomQuestion()">Carte aléatoire</button>
-    <br>
+    <div class="card" id="answerBox"></div>
+    <button class="button" onclick="nextQuestion()">➡️ Suivante</button>
+    <button class="button" onclick="randomQuestion()">🎲 Carte aléatoire</button>
     <button class="button" onclick="markCorrect()">✅ Bonne réponse</button>
     <button class="button" onclick="markWrong()">❌ Mauvaise réponse</button>
-    <canvas id="penaltyWheel" width="300" height="300" class="hidden"></canvas>
+    <div id="scrollWheel" class="hidden"><span id="scrollText"></span></div>
     <div id="penaltyBox"></div>
   </div>
 
@@ -118,32 +138,65 @@
       ]
     };
 
+    const answers = {
+      "Quel est le plat que Sophie kiffe le plus au monde ?": "La pizza maison, je pourrais en manger tous les jours !",
+      "Quelle tâche ménagère elle déteste tellement qu’elle te la refile en douce ?": "Le repassage ça passe, mais surtout sortir les poubelles…",
+      "Quelle est sa série “doudou”, celle qu’elle peut revoir en boucle ?": "Big Bang Theory ou Gossip Girl",
+      "Dans la maison, quel objet elle a imposé et toi t’as jamais compris pourquoi ?": "Les étagères remplies de livres",
+      "Quelle est la petite habitude que t’as et qu’elle trouve insupportable ?": "Vivre en caleçon et ne jamais être prêt pour ouvrir la porte",
+      "Elle a le choix entre un city trip et un week-end nature : elle choisit quoi ?": "City trip",
+      "Quel est le cadeau que tu lui as offert et qu’elle a trouvé… euh… “surprenant” ?": "Un calendrier de table",
+      "Quelle est la zone du corps où elle aime que tu l’embrasses ?": "Le cou",
+      "Si elle devait donner un surnom à ta technique au lit, ce serait quoi ?": "Le roi du freestyle",
+      "Sur 10 à combien elle note tes performances selon toi ?": "10, mention Très bien",
+      "Quel vêtement ou accessoire te rend sexy à ses yeux (vraiment) ?": "Une chemise, bien repassée",
+      "Elle te surprend un soir avec une idée “originale” : elle propose quoi ?": "Refaire une vidéo ou un truc romantique",
+      "Dans un fantasme, elle incarnerait quel rôle ?": "Secret 🤫",
+      "Quelle est la position où elle se sent reine du monde ?": "Privé MDR",
+      "À quel moment vous avez failli vous faire griller pour de vrai ?": "Jamais",
+      "Si elle devait te comparer à un animal, ce serait lequel ?": "Un golden retriever",
+      "À quel personnage de film ou série lui fais tu penser ?": "Je sais paaas",
+      "Elle doit choisir une chanson qui vous représente : laquelle elle sort ?": "Ordinary",
+      "C’est quoi le truc chez toi qu’elle trouve ridicule mais qu’elle adore quand même ?": "Le respect de ses couteaux",
+      "Elle te tatoue un mot pendant ton sommeil, juste pour se venger : elle écrit quoi ?": "Mon p’tit camembert",
+      "Elle dit souvent une phrase à propos de toi. Laquelle ?": "Il cuisine mieux qu’il ne parle les langues",
+      "Selon elle : tu serais quel type de père (dans 10 ans) ?": "Papa gaga",
+      "C’est quand le moment où elle a su que t’étais “le bon” ?": "Quand je l’ai vu pleurer pour de vrai",
+      "Quelle est la plus belle chose que tu lui as dite selon elle ?": "Je suis tellement content de ce qu’on est en train de construire",
+      "Si elle devait choisir un moment que vous avez vécu et le revivre en boucle, ce serait lequel ?": "Le mariage (ou d'autres !)",
+      "Elle a le droit de garder un seul souvenir de vous deux : c’est quoi ?": "Les aprem à la maison avec les amis et les fous rires",
+      "Un mot pour te décrire, selon elle ?": "Gentillesse incarnée",
+      "Une peur qu’elle a pour votre couple ?": "Il le sait bien…",
+      "Un rêve qu’elle a, que tu ignores peut-être encore ?": "Il connaît tous mes rêves",
+      "Comment aimerait-elle fêter votre première anniversaire de mariage ?": "Un voyage en amoureux avec notre chanson fav"
+    };
+
     const penalties = [
-      "Boire un shot préparé par 2 potes",
-      "Chanter un slow d'amour",
-      "Écrire un texto absurde à un pote",
-      "Déclaration d’amour à un objet",
-      "15 pompes + crier 'Je suis l’homme de la situation'",
-      "Story Insta + filtre gênant + ❤️",
-      "Pub pour vendre Hugo en 20 sec",
-      "Selfie avec un inconnu",
-      "Commander un verre avec un accent",
-      "Danser seul 1 min sur chanson imposée",
-      "Demander un autographe dans la rue",
-      "Imiter un guide touristique",
-      "Décrire ton crush masculin",
-      "Lettre tragique à Sophie",
-      "Répéter phrase absurde avec conviction",
-      "Mimer une scène romantique",
-      "Raconter un moment de solitude",
-      "Imitation de toi en dragueur",
-      "Changer de prénom 30 minutes",
-      "Deviner ce que chacun ferait avec 1M€",
-      "Parler comme un robot 5 min",
-      "Appeler tout le monde 'Mon trésor'",
-      "Porter un accessoire débile",
-      "Ramper façon commando",
-      "Tenir la main d’un pote 10 min"
+      "Boire un shot préparé par 2 potes (libre à eux de doser… ou pas)",
+      "Chanter le refrain d’une chanson d’amour, version slow langoureux",
+      "Écrire un texto absurde à un pote au hasard du groupe (“Tu penses qu’on devrait se reparler ?”)",
+      "Faire une déclaration d’amour à un objet de la pièce",
+      "Faire 15 pompes en criant “Je suis l’homme de la situation”",
+      "Poster une story Insta avec un filtre gênant + un cœur rouge",
+      "Inventer une pub pour vendre Hugo en 20 secondes chrono",
+      "Aller demander un selfie à un inconnu (si vous êtes dehors)",
+      "Aller commander un verre en imitant un accent (au choix du groupe)",
+      "Danser seul pendant 1 minute sur une chanson imposée",
+      "Demander un autographe à quelqu’un dans la rue, comme si c’était une star",
+      "Se faire passer pour un guide touristique et commenter un lieu pendant 30 secondes",
+      "Décrire le physique de ton crush masculin idéal (avec détails)",
+      "Lire à voix haute une lettre d’amour imaginaire à Sophie… en mode tragédie",
+      "Répéter 3 fois une phrase absurde imposée par le groupe avec le plus de conviction possible",
+      "Mimer une scène de film romantique comme si ta vie en dépendait",
+      "Tu dois raconter ton plus grand moment de solitude (niveau collège)",
+      "Imitation de toi en mode dragueur en soirée (soft)",
+      "Tu changes de prénom pendant 30 minutes (tout le monde doit t’appeler ainsi)",
+      "Dis ce que tu penses que chacun ferait s’il gagnait 1 million d’euros demain",
+      "Tu parles comme un robot pendant 5 minutes",
+      "Tu dois appeler tout le monde “Mon trésor” jusqu’à nouvel ordre",
+      "Tu portes un accessoire débile jusqu’au prochain tour",
+      "Tu fais un tour de la pièce en rampant façon commando",
+      "Tu dois tenir la main d’un pote pendant 10 minutes"
     ];
 
     let currentCat = null;
@@ -166,8 +219,11 @@
     }
 
     function showQuestion() {
-      document.getElementById('questionBox').innerText = data[currentCat][idx];
+      const q = data[currentCat][idx];
+      document.getElementById('questionBox').innerText = q;
+      document.getElementById('answerBox').innerText = answers[q] || '';
       document.getElementById('penaltyBox').innerText = "";
+      document.getElementById('scrollWheel').classList.add('hidden');
       updateProgress();
     }
 
@@ -183,13 +239,16 @@
 
     function markCorrect() {
       correctCount++;
-      showQuestion();
+      nextQuestion();
     }
 
     function markWrong() {
       wrongCount++;
-      document.getElementById("penaltyWheel").classList.remove("hidden");
-      spinWheel();
+      const gage = penalties[Math.floor(Math.random() * penalties.length)];
+      document.getElementById('scrollText').innerText = `SHOT + GAGE : ${gage}`;
+      document.getElementById('scrollWheel').classList.remove('hidden');
+      document.getElementById('penaltyBox').innerText = `🥃 + 🎯 ${gage}`;
+      updateProgress();
     }
 
     function updateProgress() {
@@ -209,66 +268,6 @@
     function backHome() {
       showScreen('home');
     }
-
-    // WHEEL
-    const canvas = document.getElementById("penaltyWheel");
-    const ctx = canvas.getContext("2d");
-    const wheelRadius = canvas.width / 2;
-    let angle = 0;
-    let spinning = false;
-
-    function drawWheel() {
-      const segmentAngle = 2 * Math.PI / penalties.length;
-      for (let i = 0; i < penalties.length; i++) {
-        ctx.beginPath();
-        ctx.moveTo(wheelRadius, wheelRadius);
-        ctx.arc(wheelRadius, wheelRadius, wheelRadius, segmentAngle * i, segmentAngle * (i + 1));
-        ctx.fillStyle = i % 2 === 0 ? "#ffa500" : "#ff6347";
-        ctx.fill();
-        ctx.fillStyle = "white";
-        ctx.font = "10px sans-serif";
-        ctx.save();
-        ctx.translate(wheelRadius, wheelRadius);
-        ctx.rotate(segmentAngle * i + segmentAngle / 2);
-        ctx.textAlign = "right";
-        ctx.fillText(penalties[i], wheelRadius - 10, 0);
-        ctx.restore();
-      }
-    }
-
-    function spinWheel() {
-      if (spinning) return;
-      spinning = true;
-      let duration = 3000;
-      let start = null;
-      let rotateSpeed = Math.random() * 10 + 10;
-
-      function rotate(timestamp) {
-        if (!start) start = timestamp;
-        let progress = timestamp - start;
-        angle += rotateSpeed;
-        rotateSpeed *= 0.98;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.save();
-        ctx.translate(wheelRadius, wheelRadius);
-        ctx.rotate(angle * Math.PI / 180);
-        ctx.translate(-wheelRadius, -wheelRadius);
-        drawWheel();
-        ctx.restore();
-
-        if (progress < duration) {
-          requestAnimationFrame(rotate);
-        } else {
-          spinning = false;
-          const segment = Math.floor(((angle % 360) / 360) * penalties.length);
-          const selected = penalties[(penalties.length - segment) % penalties.length];
-          document.getElementById('penaltyBox').innerText = `🎯 GAGE : ${selected}`;
-        }
-      }
-
-      requestAnimationFrame(rotate);
-    }
-
-    drawWheel();
   </script>
 </body>
+</html>
